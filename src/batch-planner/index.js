@@ -41,8 +41,8 @@ export default async function nextBatch(sqlAST, data, dbCall, context, options) 
       }
 
       if (Array.isArray(data)) {
-        // the "batch scope" is teh set of values to match this key against from the previous batch
-        const batchScope = uniq(data.map(obj => maybeQuote(obj[parentKey])))
+        // the "batch scope" is the set of values to match this key against from the previous batch
+        const batchScope = uniq(data.filter(obj => obj !== null).map(obj => maybeQuote(obj[parentKey])))
         // generate the SQL, with the batch scope values incorporated in a WHERE IN clause
         const { sql, shapeDefinition } = await compileSqlAST(childAST, context, { ...options, batchScope } )
         // grab the data
@@ -58,7 +58,9 @@ export default async function nextBatch(sqlAST, data, dbCall, context, options) 
         // if we they want many rows, give them an array
         if (childAST.grabMany) {
           for (let obj of data) {
-            obj[fieldName] = newData[obj[parentKey]] || []
+            if (obj) {
+              obj[fieldName] = newData[obj[parentKey]] || []
+            }
           }
         } else {
           let matchedData = []
