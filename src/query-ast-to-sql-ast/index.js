@@ -518,7 +518,7 @@ function parseArgValue(value, variableValues) {
   case 'ObjectValue':
     return value.fields.map(value => parseArgValue(value, variableValues))
   case 'ObjectField':
-    return {name:value.name.value,value:value.value.value}
+    return {name:value.name.value,value:value.value.values || value.value.value}
   default:
     return value.value
   }
